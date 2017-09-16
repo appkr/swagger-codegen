@@ -20,6 +20,7 @@ namespace {{apiPackage}};
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\ConnectionException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\MultipartStream;
 use GuzzleHttp\Psr7\Request;
@@ -132,12 +133,18 @@ use {{invokerPackage}}\ObjectSerializer;
             try {
                 $response = $this->client->send($request, $options);
             } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
-                );
+                $message = "[{$e->getCode()}] {$e->getMessage()}";
+                $code = $e->getCode() ?: 500;
+                $responseHeaders = $e->getResponse() ? $e->getResponse()->getHeaders() : [];
+                $responseBody = $e->getResponse()
+                    ? json_decode($e->getResponse()->getBody()->getContents())
+                    : null;
+
+                if ($e instanceof ConnectionException) {
+                    $message = "[{$code}] The server is not reachable.";
+                }
+
+                throw new ApiException($message, $code, $responseHeaders, $responseBody, $e);
             }
 
             $statusCode = $response->getStatusCode();
