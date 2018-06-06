@@ -102,6 +102,13 @@ class Configuration
     protected $tempFolderPath;
 
     /**
+     * Default request headers
+     *
+     * @var array
+     */
+    protected $defaultHeaders;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -418,5 +425,28 @@ class Configuration
         }
 
         return $keyWithPrefix;
+    }
+
+    /**
+     * Gets the default headers
+     *
+     * @return array
+     */
+    public function getDefaultHeaders()
+    {
+        return $this->defaultHeaders;
+    }
+
+    /**
+     * Sets the default headers
+     *
+     * @param array $defaultHeaders
+     *
+     * @return $this
+     */
+    public function setDefaultHeaders($defaultHeaders = [])
+    {
+        $this->defaultHeaders = $defaultHeaders;
+        return $this;
     }
 }

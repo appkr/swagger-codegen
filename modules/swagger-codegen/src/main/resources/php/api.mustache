@@ -20,7 +20,7 @@ namespace {{apiPackage}};
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\ConnectionException;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\MultipartStream;
 use GuzzleHttp\Psr7\Request;
@@ -140,7 +140,7 @@ use {{invokerPackage}}\ObjectSerializer;
                     ? json_decode($e->getResponse()->getBody()->getContents())
                     : null;
 
-                if ($e instanceof ConnectionException) {
+                if ($e instanceof ConnectException) {
                     $message = "[{$code}] The server is not reachable.";
                 }
 
@@ -480,7 +480,7 @@ use {{invokerPackage}}\ObjectSerializer;
         {{/isOAuth}}
         {{/authMethods}}
 
-        $defaultHeaders = [];
+        $defaultHeaders = $this->config->getDefaultHeaders();
         if ($this->config->getUserAgent()) {
             $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
         }
